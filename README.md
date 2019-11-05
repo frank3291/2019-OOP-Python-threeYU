@@ -33,11 +33,16 @@
 -미니게임 진행에 있어 랜덤으로 미로를 제작하고 괴물과 인간에 대한 클래스를 제작해 미니게임 진행이 원활하도록 한다.
 
 ## 7. 구현에 필요한 라이브러리나 기술
- 라이브러리 
+ 라이브러리
+ 
 -pygame
+
 -random
+
 -time
+
 -numpy
+
  기술
 - Recursive Backtracking
 - Prim's Algorithm
