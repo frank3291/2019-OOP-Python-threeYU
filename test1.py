@@ -1,1 +1,1 @@
-print("dfljafkldsja")
+print(1)
