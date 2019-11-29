@@ -1,3 +1,5 @@
+#수정 1. 타이머 기능 추가
+
 # Maze
 import random, pygame, sys
 import time
@@ -16,6 +18,9 @@ assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell s
 CELLWIDTH = int(WINDOWWIDTH / CELLSIZE)
 CELLHEIGHT = int(WINDOWHEIGHT / CELLSIZE)
 
+#IMAGE PART
+timerimg=pygame.image.load("timer.png")
+timerimg=pygame.transform.scale(timerimg,(240,120))
 #             R    G    B
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -79,8 +84,8 @@ def main():
 
     showStartScreen()
     while True:
-        runGame()
-        showGameOverScreen()
+        tmp=runGame()
+        showGameOverScreen(tmp)
 
 
 def mazemaker():
@@ -107,7 +112,7 @@ def getRandomLocation():
 
 
 def drawPressKeyMsg():
-    pressKeySurf = BASICFONT.render('NEXT LEVEL[Press Any Button].', True, DARKGRAY)
+    pressKeySurf = BASICFONT.render('[Press Any Button].', True, DARKGRAY)
     pressKeyRect = pressKeySurf.get_rect()
     pressKeyRect.topleft = (WINDOWWIDTH - 200, WINDOWHEIGHT - 30)
     DISPLAYSURF.blit(pressKeySurf, pressKeyRect)
@@ -119,6 +124,8 @@ def drawItem(coord):
     appleRect = pygame.Rect(x, y, CELLSIZE, CELLSIZE)
     pygame.draw.rect(DISPLAYSURF, RED, appleRect)
 
+def InputImage(x,y,IMG):
+    DISPLAYSURF.blit(IMG,(x,y))
 
 def runGame():
     mazemap = mazemaker()
@@ -128,7 +135,19 @@ def runGame():
     field.maze[w - 1][h - 1] = 1
     garo = w
     sero = h
+    mouse_x=0
+    mouse_y=0
+    start_ticks=pygame.time.get_ticks()
     while True:
+        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+        timeleft=20-seconds
+        if timeleft<0:
+            return 0
+        sec=int(timeleft//1)
+        smallsec=int(round(timeleft%1,2)//0.01)
+        timerstr=str(sec)+' : '+str(smallsec)
+        timertext=pygame.font.SysFont('freesansbold.ttf', 100)
+        text=timertext.render(timerstr,True,BLACK)
         for event in pygame.event.get():
             nowx = human.x
             nowy = human.y
@@ -145,26 +164,31 @@ def runGame():
                     human.moveDown()
                 elif event.key == K_ESCAPE:
                     terminate()
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 mouse_x = pos[0]
                 mouse_y = pos[1]
+                print(pos)
                 mapx = mouse_x // CELLSIZE
                 mapy = mouse_y // CELLSIZE
                 if human.count > 0:
                     field.maze[mapy][mapx] = 1
                     human.count = human.count - 1
                     print(human.count)
-            DISPLAYSURF.fill(BGCOLOR)
+
             if nowx == w - 1 and nowy == h - 1:
-                return
-            field.draw()
-            drawGrid()
-            drawGoal(w - 1, h - 1)
-            drawPlayer(nowx, nowy)
-            # drawItem(item)
-            pygame.display.update()
-            FPSCLOCK.tick(FPS)
+                return 1
+        DISPLAYSURF.fill(BGCOLOR)
+        field.draw()
+        drawGrid()
+        InputImage(4, 405, timerimg)
+        DISPLAYSURF.blit(text, (15, 420))
+
+        drawGoal(w - 1, h - 1)
+        drawPlayer(nowx, nowy)
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
 
 
 def checkForKeyPress():
@@ -179,10 +203,14 @@ def checkForKeyPress():
     return keyUpEvents[0].key
 
 
-def showGameOverScreen():
-    gameOverFont = pygame.font.Font('freesansbold.ttf', 150)
+def showGameOverScreen(tmp):
+    DISPLAYSURF.fill(BGCOLOR)
+    gameOverFont = pygame.font.Font('freesansbold.ttf', 100)
     gameSurf = gameOverFont.render('YOU', True, WHITE)
-    overSurf = gameOverFont.render('WIN!', True, WHITE)
+    if tmp==1:
+        overSurf = gameOverFont.render('WIN!', True, GREEN)
+    elif tmp==0:
+        overSurf = gameOverFont.render('LOSE!', True, RED)
     gameRect = gameSurf.get_rect()
     overRect = overSurf.get_rect()
     gameRect.midtop = (WINDOWWIDTH / 2, 10)
