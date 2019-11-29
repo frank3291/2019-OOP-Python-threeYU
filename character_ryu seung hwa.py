@@ -28,12 +28,12 @@ class Player(object):
         self.x1 = corner1[0]
         self.y1 = corner1[1]
         self.image1 = pygame.image.load("MR1.png").convert_alpha()
-        self.image1 = pygame.transform.scale(self.image1, (100, 100))
+        self.image1 = pygame.transform.scale(self.image1, (image_length, image_height))
 
         self.x2 = corner2[0]
         self.y2 = corner2[1]
         self.image2 = pygame.image.load("MR2.png").convert_alpha()
-        self.image2 = pygame.transform.scale(self.image2, (100, 100))
+        self.image2 = pygame.transform.scale(self.image2, (image_length, image_height))
 
 
 
@@ -63,22 +63,26 @@ while ending==False:
                 if (mouse_x > corner1[0]) and (mouse_x < corner1[0]+image_length) and (mouse_y > corner1[1]) and (mouse_y < corner1[1]+image_height):
                     if button2 == True:
                         screen.fill(BLACK)
-                        image_length=0
-                        image_height=0
-                        screen.blit(pygame.image.load("MR5.png").convert_alpha(), ((corner1[0]+corner1[1])/2,(corner2[0]+corner2[1])/2))
+                        newcharacter1 = pygame.image.load("MR5.png").convert_alpha()
+                        newcharacter1 = pygame.transform.scale(newcharacter1, (image_length, image_height))
+                        screen.blit(newcharacter1, ((corner1[0]+corner2[0])/2,(corner1[0]+corner2[1])/2))
+                        image_length = 0
+                        image_height = 0
                         pygame.display.update()
 
                     print ("character one is selected")
                     button1 = True
-                    # if (button1 == True and button2 == True):
-                    #     screen.fill(BLACK)
                     button2=False
 
                 elif (mouse_x > corner2[0]) and (mouse_x < corner2[0]+image_length) and (mouse_y > corner2[1]) and (mouse_y < corner2[1]+image_height):
                     if button1 == True:
                         screen.fill(BLACK)
+
+                        newcharacter2 = pygame.image.load("MR5.png").convert_alpha()
+                        newcharacter2 = pygame.transform.scale(newcharacter2, (image_length, image_height))
+                        screen.blit(newcharacter2, ((corner1[0] + corner2[0]) / 2, (corner1[0] + corner2[1]) / 2))
                         image_length = 0
-                        image_height=0
+                        image_height = 0
                         pygame.display.update()
                     button2 = True
                     print ("character two is selected")
