@@ -1,5 +1,5 @@
 #수정 1. 타이머 기능 추가
-
+#수정 2. 배경음악, 캐릭터 정보창 추가
 # Maze
 import random, pygame, sys
 import time
@@ -7,8 +7,8 @@ import numpy as np
 from pygame.locals import *
 
 FPS = 15
-WINDOWWIDTH = 400
-WINDOWHEIGHT = 600
+WINDOWWIDTH = 600
+WINDOWHEIGHT = 780
 global w, h
 w = 40
 h = 40
@@ -17,15 +17,21 @@ assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell siz
 assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
 CELLWIDTH = int(WINDOWWIDTH / CELLSIZE)
 CELLHEIGHT = int(WINDOWHEIGHT / CELLSIZE)
+#character part
 
 #IMAGE PART
 timerimg=pygame.image.load("timer.png")
-timerimg=pygame.transform.scale(timerimg,(240,120))
+timerimg=pygame.transform.scale(timerimg,(360,180))
+infoimg=pygame.image.load("information.png")
+infoimg=pygame.transform.scale(infoimg,(225,177))
+A_1=pygame.image.load("A_1.png")
+A_1=pygame.transform.scale(A_1,(142,156))
 #             R    G    B
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+BLUE=(0,0,255)
 DARKGREEN = (0, 155, 0)
 DARKGRAY = (40, 40, 40)
 BGCOLOR = BLACK
@@ -40,6 +46,8 @@ class Player:
     x = 0
     y = 0
     speed = 1
+    rank="A"
+    Name='Minho'
     count = 10
 
     def moveRight(self):
@@ -72,10 +80,9 @@ class Maze:
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, breaksound
     global item
-    item = getRandomLocation
-
+    item = getRandomLocation()
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -127,7 +134,11 @@ def drawItem(coord):
 def InputImage(x,y,IMG):
     DISPLAYSURF.blit(IMG,(x,y))
 
+
 def runGame():
+    pygame.mixer.music.load('bgmusic.mp3')
+    pygame.mixer.music.play(-1,0.0)
+
     mazemap = mazemaker()
     human = Player()
     field = Maze()
@@ -137,17 +148,26 @@ def runGame():
     sero = h
     mouse_x=0
     mouse_y=0
+    nowx=0
+    nowy=0
     start_ticks=pygame.time.get_ticks()
     while True:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
-        timeleft=20-seconds
+        timeleft=40-seconds
         if timeleft<0:
             return 0
         sec=int(timeleft//1)
         smallsec=int(round(timeleft%1,2)//0.01)
         timerstr=str(sec)+' : '+str(smallsec)
-        timertext=pygame.font.SysFont('freesansbold.ttf', 100)
-        text=timertext.render(timerstr,True,BLACK)
+        timertext=pygame.font.SysFont('freesansbold.ttf', 150)
+        normaltext = pygame.font.SysFont('freesansbold.ttf', 24)
+        texttime=timertext.render(timerstr,True,BLACK)
+        textname=normaltext.render("NAME",True,BLACK)
+        textrank=normaltext.render("RANK",True,BLACK)
+        textcount=normaltext.render("COUNT",True,BLACK)
+        textname_val = normaltext.render(human.Name, True, BLUE)
+        textrank_val = normaltext.render(human.rank, True, BLUE)
+        textcount_val = normaltext.render(str(human.count), True, BLUE)
         for event in pygame.event.get():
             nowx = human.x
             nowy = human.y
@@ -182,9 +202,16 @@ def runGame():
         DISPLAYSURF.fill(BGCOLOR)
         field.draw()
         drawGrid()
-        InputImage(4, 405, timerimg)
-        DISPLAYSURF.blit(text, (15, 420))
-
+        InputImage(6, 606, timerimg)
+        InputImage(372,609,infoimg)
+        InputImage(378,621,A_1)
+        DISPLAYSURF.blit(texttime, (21, 630))
+        DISPLAYSURF.blit(textname, (530, 621))
+        DISPLAYSURF.blit(textrank, (530, 663))
+        DISPLAYSURF.blit(textcount, (530, 705))
+        DISPLAYSURF.blit(textname_val, (530, 642))
+        DISPLAYSURF.blit(textrank_val, (530, 684))
+        DISPLAYSURF.blit(textcount_val, (530, 726))
         drawGoal(w - 1, h - 1)
         drawPlayer(nowx, nowy)
         pygame.display.update()
