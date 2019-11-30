@@ -1,10 +1,17 @@
 #수정 1. 타이머 기능 추가
 #수정 2. 배경음악, 캐릭터 정보창 추가
+#수정 3. 몬스터 추가
 # Maze
 import random, pygame, sys
 import time
 import numpy as np
 from pygame.locals import *
+
+
+pygame.mixer.init()
+sound = pygame.mixer.Sound("break.wav")
+sound.set_volume(0.5)
+
 
 FPS = 15
 WINDOWWIDTH = 600
@@ -26,6 +33,10 @@ infoimg=pygame.image.load("information.png")
 infoimg=pygame.transform.scale(infoimg,(225,177))
 A_1=pygame.image.load("A_1.png")
 A_1=pygame.transform.scale(A_1,(142,156))
+youwin=pygame.image.load("youwin.jpg")
+youwin=pygame.transform.scale(youwin,(400,300))
+youlose=pygame.image.load("youlose.jpg")
+youlose=pygame.transform.scale(youlose,(400,300))
 #             R    G    B
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -41,6 +52,27 @@ DOWN = 'down'
 LEFT = 'left'
 RIGHT = 'right'
 
+class Monster:
+    x=0
+    y=0
+    nextloc=[0,0]
+    movex=[1,-1,0,0]
+    movey=[0,0,-1,1]
+
+    def lengthwithhuman(self,humanx,humany,mobx,moby):
+        return (humanx-mobx)**2+(humany-moby)**2
+
+    def movement(self,humanx,humany,mobx,moby,maze):
+        min=1000000
+        for i in range(4):
+            monx=mobx+self.movex[i]
+            mony=moby+self.movey[i]
+            if min>self.lengthwithhuman(humanx,humany,monx,mony) and monx<w and monx>=0 and mony<h and mony>=0:
+                min = self.lengthwithhuman(humanx, humany, monx, mony)
+                self.nextloc[0]=mobx+self.movex[i]
+                self.nextloc[1]=moby+self.movey[i]
+
+        return self.nextloc
 
 class Player:
     x = 0
@@ -90,10 +122,10 @@ def main():
     pygame.display.set_caption('MAZE')
 
     showStartScreen()
-    while True:
-        tmp=runGame()
-        showGameOverScreen(tmp)
 
+    tmp=runGame()
+    showGameOverScreen(tmp)
+    terminate()
 
 def mazemaker():
     Map = np.ndarray([w, h, 2], np.int)
@@ -115,8 +147,11 @@ def terminate():
 
 
 def getRandomLocation():
-    return {'x': random.randint(0, CELLWIDTH - 1), 'y': random.randint(0, CELLHEIGHT - 1)}
+    ans={'x':0,'y':0}
+    while ans['x']<10 and ans['y']<10:
+        ans={'x': random.randint(0, CELLWIDTH - 1), 'y': random.randint(0, CELLHEIGHT - 1)}
 
+    return ans
 
 def drawPressKeyMsg():
     pressKeySurf = BASICFONT.render('[Press Any Button].', True, DARKGRAY)
@@ -141,6 +176,12 @@ def runGame():
 
     mazemap = mazemaker()
     human = Player()
+    monster=Monster()
+    monloc=getRandomLocation()
+    monster.x=monloc['x']
+    mobx=monster.x
+    monster.y=monloc['y']
+    moby=monster.y
     field = Maze()
     field.maze = mazemap
     field.maze[w - 1][h - 1] = 1
@@ -157,7 +198,9 @@ def runGame():
         if timeleft<0:
             return 0
         sec=int(timeleft//1)
+        secchk=sec%2
         smallsec=int(round(timeleft%1,2)//0.01)
+        smallsecchk=smallsec%4
         timerstr=str(sec)+' : '+str(smallsec)
         timertext=pygame.font.SysFont('freesansbold.ttf', 150)
         normaltext = pygame.font.SysFont('freesansbold.ttf', 24)
@@ -186,6 +229,7 @@ def runGame():
                     terminate()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                sound.play()
                 pos = pygame.mouse.get_pos()
                 mouse_x = pos[0]
                 mouse_y = pos[1]
@@ -199,6 +243,12 @@ def runGame():
 
             if nowx == w - 1 and nowy == h - 1:
                 return 1
+            if mobx==nowx and moby==nowy:
+                return 0
+        if secchk==0 and smallsecchk==0:
+            nextloc=monster.movement(nowx,nowy,mobx,moby,field.maze)
+            mobx=nextloc[0]
+            moby=nextloc[1]
         DISPLAYSURF.fill(BGCOLOR)
         field.draw()
         drawGrid()
@@ -214,6 +264,7 @@ def runGame():
         DISPLAYSURF.blit(textcount_val, (530, 726))
         drawGoal(w - 1, h - 1)
         drawPlayer(nowx, nowy)
+        drawmonster(mobx,moby)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -236,8 +287,10 @@ def showGameOverScreen(tmp):
     gameSurf = gameOverFont.render('YOU', True, WHITE)
     if tmp==1:
         overSurf = gameOverFont.render('WIN!', True, GREEN)
+        InputImage(100, 300, youwin)
     elif tmp==0:
         overSurf = gameOverFont.render('LOSE!', True, RED)
+        InputImage(100, 300, youlose)
     gameRect = gameSurf.get_rect()
     overRect = overSurf.get_rect()
     gameRect.midtop = (WINDOWWIDTH / 2, 10)
@@ -247,13 +300,8 @@ def showGameOverScreen(tmp):
     DISPLAYSURF.blit(overSurf, overRect)
     drawPressKeyMsg()
     pygame.display.update()
-    pygame.time.wait(500)
-    checkForKeyPress()  # clear out any key presses in the event queue
-
-    while True:
-        if checkForKeyPress():
-            pygame.event.get()  # clear event queue
-            return
+    pygame.time.wait(1000)
+    return
 
 
 def showStartScreen():
@@ -291,6 +339,12 @@ def drawPlayer(nowx, nowy):
     y = nowy * CELLSIZE
     playerRect = pygame.Rect(x, y, CELLSIZE, CELLSIZE)
     pygame.draw.rect(DISPLAYSURF, DARKGREEN, playerRect)
+
+def drawmonster(nowx, nowy):
+    x = nowx * CELLSIZE
+    y = nowy * CELLSIZE
+    playerRect = pygame.Rect(x, y, CELLSIZE, CELLSIZE)
+    pygame.draw.rect(DISPLAYSURF, BLUE, playerRect)
 
 
 def drawGrid():
