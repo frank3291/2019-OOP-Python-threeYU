@@ -1,7 +1,8 @@
 import pygame, sys
 from pygame.locals import *
+import time
 
-TIMER = 30
+TIMER = 300
 SCREEN_X = 400
 SCREEN_Y = 400
 
@@ -9,9 +10,6 @@ screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
 clock = pygame.time.Clock() #tick-tock
 
 ending = button1 = button2 = False
-
-corner1 = (28,18)  #Top Left corner of button 1
-corner2 = (156,18)  #Top Left corner of button 2
 
 image_length = 100 #length of the buttons
 image_height = 100 #height of the buttons
@@ -23,17 +21,43 @@ time_limit = 60 # 제한 시간
 BLACK=(0,0,0)
 WHITE=(255,255,255)
 
+corner = [[0,0],[100,0],[200,0],[300,0],[0,100],[100,100],[200,100],[300,100],[0,200],[100,200],[200,200],[300,200],[0,300],[100,300],[200,300],[300,300]]
+maze_runner_character_image = [0,0,0,0,0,0,0,0,0,0]
+visit = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+
+
+maze_runner_character_image[0] = pygame.image.load("MR1.png").convert_alpha()
+maze_runner_character_image[1] = pygame.image.load("MR2.png").convert_alpha()
+maze_runner_character_image[2] = pygame.image.load("MR3.png").convert_alpha()
+maze_runner_character_image[3] = pygame.image.load("MR4.png").convert_alpha()
+maze_runner_character_image[4] = pygame.image.load("MR5.png").convert_alpha()
+maze_runner_character_image[5] = pygame.image.load("MR6.png").convert_alpha()
+maze_runner_character_image[6] = pygame.image.load("MR7.png").convert_alpha()
+maze_runner_character_image[7] = pygame.image.load("MR8.png").convert_alpha()
+maze_runner_character_image[8] = pygame.image.load("MR9.png").convert_alpha()
+maze_runner_character_image[9] = pygame.image.load("MR10.png").convert_alpha()
+
+
+for i in range(10):
+    maze_runner_character_image[i] = pygame.transform.scale(maze_runner_character_image[i], (image_length, image_height))
+
+image_delete = pygame.image.load("black.png").convert_alpha()
+image_delete = pygame.transform.scale(image_delete,(image_length, image_height))
+
+
+
 class Player(object):
     def __init__(self):
-        self.x1 = corner1[0]
-        self.y1 = corner1[1]
+        self.x1 = corner[0][0]
+        self.y1 = corner[0][1]
         self.image1 = pygame.image.load("MR1.png").convert_alpha()
         self.image1 = pygame.transform.scale(self.image1, (image_length, image_height))
 
-        self.x2 = corner2[0]
-        self.y2 = corner2[1]
+        self.x2 = corner[1][0]
+        self.y2 = corner[1][1]
         self.image2 = pygame.image.load("MR2.png").convert_alpha()
         self.image2 = pygame.transform.scale(self.image2, (image_length, image_height))
+
 
 
 
@@ -46,8 +70,25 @@ player = Player()
 player.draw()
 pygame.display.update()
 
+
+
+def check_image1():
+    check1 = pygame.image.load("check.png").convert_alpha()
+    check1 = pygame.transform.scale(check1, (image_length, image_height))
+    screen.blit(check1, (corner[0][0], corner[0][1]))
+    pygame.display.update()
+
+
+def check_image2():
+    check1 = pygame.image.load("check.png").convert_alpha()
+    check1 = pygame.transform.scale(check1, (image_length, image_height))
+    screen.blit(check1, (corner[1][0], corner[1][1]))
+    pygame.display.update()
+
+
 #Main Loop:
 while ending==False:
+
     counter+=1
     clock.tick(TIMER)
 
@@ -58,54 +99,62 @@ while ending==False:
                 print("Game Stopped Early by user")
 
         elif event.type == MOUSEBUTTONDOWN:
+
             if event.button == 1:
                 mouse_x, mouse_y = event.pos
-                if (mouse_x > corner1[0]) and (mouse_x < corner1[0]+image_length) and (mouse_y > corner1[1]) and (mouse_y < corner1[1]+image_height):
+                if (mouse_x > corner[0][0]) and (mouse_x < corner[0][0]+image_length) and (mouse_y > corner[0][1]) and (mouse_y < corner[0][1]+image_height):
+                    print("character one is selected")
+                    check_image1()
                     if button2 == True:
-                        screen.fill(BLACK)
-                        newcharacter1 = pygame.image.load("MR5.png").convert_alpha()
+                        time.sleep(1)
+                        #screen.fill(BLACK)
+                        screen.blit(image_delete,(corner[0][0], corner[0][1]))
+                        screen.blit(image_delete,(corner[1][0], corner[1][1]))
+
+                        newcharacter1 = pygame.image.load("MR4.png").convert_alpha()
                         newcharacter1 = pygame.transform.scale(newcharacter1, (image_length, image_height))
-                        screen.blit(newcharacter1, ((corner1[0]+corner2[0])/2,(corner1[0]+corner2[1])/2))
+                        screen.blit(newcharacter1, (min(corner[0][0], corner[1][0]), min(corner[0][1], corner[1][1])))
                         image_length = 0
                         image_height = 0
                         pygame.display.update()
 
-                    print ("character one is selected")
                     button1 = True
-                    button2=False
+                    button2 = False
 
-                elif (mouse_x > corner2[0]) and (mouse_x < corner2[0]+image_length) and (mouse_y > corner2[1]) and (mouse_y < corner2[1]+image_height):
+                elif (mouse_x > corner[1][0]) and (mouse_x < corner[1][0]+image_length) and (mouse_y > corner[1][1]) and (mouse_y < corner[1][1]+image_height):
+
+                    print ("character two is selected")
+                    check_image2()
+
                     if button1 == True:
+                        time.sleep(1)
                         screen.fill(BLACK)
-
-                        newcharacter2 = pygame.image.load("MR5.png").convert_alpha()
+                        newcharacter2 = pygame.image.load("MR4.png").convert_alpha()
                         newcharacter2 = pygame.transform.scale(newcharacter2, (image_length, image_height))
-                        screen.blit(newcharacter2, ((corner1[0] + corner2[0]) / 2, (corner1[0] + corner2[1]) / 2))
+                        screen.blit(newcharacter2, (min(corner[0][0], corner[1][0]), min(corner[0][1], corner[1][1])))
                         image_length = 0
                         image_height = 0
                         pygame.display.update()
+
                     button2 = True
-                    print ("character two is selected")
-                    # if(button1 == True and button2 == True):
-                    #     screen.fill(BLACK)
-                    button1=False
+                    button1 = False
 
 
                 else:
-                    #print ("That's not a character")
-                    button1=False
-                    button2=False
+                    button1 = False
+                    button2 = False
+
 
     if counter == TIMER:  #prints the statements once a second
+
         counter=0
         print("%.2f" % sec)
         sec = sec +1
-        #if button1==True:
-           # print ("character one is currently selected")
 
-        #elif button2==True:
-         #   print ("character two is currently selected")
+        if sec%5 == 0:
+            image_new = pygame.image.load("MR3.png").convert_alpha()
+            image_new = pygame.transform.scale(image_new, (image_length, image_height))
+            screen.blit(image_new, (200,0))
+            pygame.display.update()
 
-        #else:
-            #print ("No character currently selected")
 
