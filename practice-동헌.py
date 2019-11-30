@@ -6,10 +6,7 @@ import random, pygame, sys
 import time
 import numpy as np
 from pygame.locals import *
-
-
-
-
+#program setting
 FPS = 15
 WINDOWWIDTH = 600
 WINDOWHEIGHT = 780
@@ -155,13 +152,6 @@ def drawPressKeyMsg():
     pressKeyRect = pressKeySurf.get_rect()
     pressKeyRect.topleft = (WINDOWWIDTH - 200, WINDOWHEIGHT - 30)
     DISPLAYSURF.blit(pressKeySurf, pressKeyRect)
-
-
-def drawItem(coord):
-    x = coord['x'] * CELLSIZE
-    y = coord['y'] * CELLSIZE
-    appleRect = pygame.Rect(x, y, CELLSIZE, CELLSIZE)
-    pygame.draw.rect(DISPLAYSURF, RED, appleRect)
 
 def InputImage(x,y,IMG):
     DISPLAYSURF.blit(IMG,(x,y))
