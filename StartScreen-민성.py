@@ -1,20 +1,31 @@
 # 맨 처음 시작화면
-
 import pygame as pg
 
-
 pg.init()
+flag = 1
+Background = pg.image.load("background.jpg")
+Background = pg.transform.scale(Background,(800,600))
+Title = pg.image.load("Title.PNG")
+Title = pg.transform.scale(Title,(680,150))
+HowToPlayImg = pg.image.load("howtoplayimg.PNG")
+HowToPlayImg = pg.transform.scale(HowToPlayImg,(800,600))
+
+pg.mixer_music.load("backgroundmusic.mp3")
+pg.mixer_music.play(-1,0.0)
+
 screen = pg.display.set_mode((800, 600))
 FONT = pg.font.SysFont('Comic Sans MS', 32)
 
 IMAGE_NORMAL = pg.Surface((100, 32))
-IMAGE_NORMAL.fill(pg.Color('dodgerblue1'))
+IMAGE_NORMAL.fill(pg.Color('brown'))
 IMAGE_HOVER = pg.Surface((100, 32))
-IMAGE_HOVER.fill(pg.Color('lightskyblue'))
+IMAGE_HOVER.fill(pg.Color('brown'))
 IMAGE_DOWN = pg.Surface((100, 32))
-IMAGE_DOWN.fill(pg.Color('aquamarine1'))
+IMAGE_DOWN.fill(pg.Color('black'))
 
 
+def displayimage(Imagename,x,y):
+    screen.blit(Imagename,(x,y))
 
 class Button(pg.sprite.Sprite):
 
@@ -22,6 +33,7 @@ class Button(pg.sprite.Sprite):
                  font=FONT, text='', text_color=(0, 0, 0),
                  image_normal=IMAGE_NORMAL, image_hover=IMAGE_HOVER,
                  image_down=IMAGE_DOWN):
+
         super().__init__()
 
         self.image_normal = pg.transform.scale(image_normal, (width, height))
@@ -48,7 +60,6 @@ class Button(pg.sprite.Sprite):
                 self.image = self.image_down
                 self.button_down = True
         elif event.type == pg.MOUSEBUTTONUP:
-
             if self.rect.collidepoint(event.pos) and self.button_down:
                 self.callback()
                 self.image = self.image_hover
@@ -69,34 +80,36 @@ class StartScreen:
         self.screen = screen
 
         self.all_sprites = pg.sprite.Group()
-        self.number = 0
 
         self.start_button = Button(
-            320, 100, 200, 65, self.start_game,
+            50, 350, 200, 65, self.start_game,
             FONT, 'Game Start', (255, 255, 255),
             IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
 
         self.quit_button = Button(
-            320, 300, 200, 65, self.quit_game,
+            550, 350, 200, 65, self.quit_game,
             FONT, 'Quit', (255, 255, 255))
 
         self.how_to_play_button = Button(
-            320, 200, 200, 65, self.how_to_play,
+            300, 350, 200, 65, self.how_to_play,
             FONT, 'How To Play', (255, 255, 255))
+
         self.all_sprites.add(self.start_button, self.quit_button,self.how_to_play_button)
 
     def quit_game(self):
         self.done = True
+        global flag
+        flag = 0
 
     def start_game(self):
-        playgame()
-
-
-    def how_to_play(self):
         pass
 
+    def how_to_play(self):
+        global flag
+        flag = 2
+
     def run(self):
-        while not self.done:
+        while not self.done and flag == 1:
             self.dt = self.clock.tick(30) / 1000
             self.handle_events()
             self.run_logic()
@@ -113,12 +126,54 @@ class StartScreen:
         self.all_sprites.update(self.dt)
 
     def draw(self):
-        self.screen.fill((30, 30, 30))
+        displayimage(Background,0,0)
+        displayimage(Title,60,100)
         self.all_sprites.draw(self.screen)
         pg.display.flip()
 
+class HowToPlayScreen:
+    def __init__(self, screen):
+        self.done = False
+        self.clock = pg.time.Clock()
+        self.screen = screen
+        self.all_sprites = pg.sprite.Group()
+
+        self.back_button = Button(
+        300, 520, 200, 65, self.back,
+        FONT, 'Back', (255, 255, 255),
+        IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
+        self.all_sprites.add(self.back_button)
+
+    def back(self):
+        global flag
+        flag = 1
+
+    def run(self):
+        while not self.done and flag == 2:
+            self.dt = self.clock.tick(30) / 1000
+            self.handle_events()
+            self.run_logic()
+            self.draw()
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.done = True
+            for button in self.all_sprites:
+                button.handle_event(event)
+
+    def run_logic(self):
+        self.all_sprites.update(self.dt)
+
+    def draw(self):
+        displayimage(HowToPlayImg,0,0)
+        self.all_sprites.draw(self.screen)
+        pg.display.flip()
 
 if __name__ == '__main__':
-    pg.init()
-    StartScreen(screen).run()
+    while flag != 0:
+        if flag == 1:
+            StartScreen(screen).run()
+        elif flag == 2:
+            HowToPlayScreen(screen).run()
     pg.quit()
