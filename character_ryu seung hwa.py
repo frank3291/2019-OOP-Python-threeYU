@@ -20,7 +20,7 @@ WHITE=(255,255,255)
 pygame.init()
 # corner = [[0,0],[100,0],[200,0],[300,0],[0,100],[100,100],[200,100],[300,100],[0,200],[100,200],[200,200],[300,200],[0,300],[100,300],[200,300],[300,300]]
 maze_runner_character_image = [0,0,0,0,0,0,0,0,0,0]
-is_image = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+is_image = [[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1]]
 character_checked = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 maze_runner_character_image[0] = pygame.image.load("MR1.png").convert_alpha()
@@ -47,41 +47,6 @@ check = pygame.transform.scale(check, (100,100))
 range_check = [0, 100, 200, 300, 400]
 
 
-# class Player(object):
-#     def __init__(self):
-#         self.x1 = corner[0][0]
-#         self.y1 = corner[0][1]
-#         self.image1 = pygame.image.load("MR1.png").convert_alpha()
-#         self.image1 = pygame.transform.scale(self.image1, (image_length, image_height))
-#
-#         self.x2 = corner[1][0]
-#         self.y2 = corner[1][1]
-#         self.image2 = pygame.image.load("MR2.png").convert_alpha()
-#         self.image2 = pygame.transform.scale(self.image2, (image_length, image_height))
-#
-#
-#     def draw(self):
-#         screen.blit(self.image1, (self.x1, self.y1))
-#         screen.blit(self.image2, (self.x2, self.y2))
-#
-#
-# player = Player()
-# player.draw()
-# pygame.display.update()
-
-
-
-# def check_image1():
-#
-#     screen.blit(check1, (corner[0][0], corner[0][1]))
-#     pygame.display.update()
-#
-#
-# def check_image2():
-#     check1 = pygame.image.load("check.png").convert_alpha()
-#     check1 = pygame.transform.scale(check1, (image_length, image_height))
-#     screen.blit(check1, (corner[1][0], corner[1][1]))
-#     pygame.display.update()
 
 while (True):
 
@@ -91,9 +56,9 @@ while (True):
     if counter%500 == 0:
         for i in range(4):
             for j in range(4):
-                if is_image[i][j] == 0 and flag == 1:
+                if is_image[i][j] == -1 and flag == 1:
                     screen.blit(maze_runner_character_image[0],(j*100, i*100))
-                    is_image[i][j] =1
+                    is_image[i][j] = 0
                     pygame.display.update()
                     flag=0
             if flag == 0:
@@ -113,15 +78,26 @@ while (True):
 
                 for i in range(4):
                     for j in range(4):
-                        if is_image[i][j] == 1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1]:
+                        if is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1]:
                             #print("click")
                             screen.blit(check, (range_check[j], range_check[i]))
                             pygame.display.update()
                             character_checked[i][j] = 1
-                            #for k in range(4):
-                               # for l in range(4):
-                                    #if character_checked[k][l]==1 and k!=i and l!=j:
-                                        #캐릭터 합치기
+
+                            for k in range(4):
+                               for l in range(4):
+                                    if character_checked[k][l]==1 and k!=i and l!=j and is_image[k][l] == is_image[i][j]:
+                                        screen.blit(image_delete,(j*100,i*100))
+                                        screen.blit(image_delete,(l*100,k*100))
+                                        character_checked[i][j] = 0
+                                        character_checked[k][l] = 0
+                                        screen.blit(maze_runner_character_image[is_image[i][j]+1],(min(j,l)*100, min(i,k)*100))
+                                        is_image[min(i,k)][min(j,l)]=is_image[i][j]+1
+
+                                        is_image[i][j] = -1
+                                        is_image[k][l] = -1
+                                        pygame.display.update()
+
 
 
 
