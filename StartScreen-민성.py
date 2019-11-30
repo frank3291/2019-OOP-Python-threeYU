@@ -2,11 +2,13 @@
 import pygame as pg
 
 pg.init()
-
+flag = 1
 Background = pg.image.load("background.jpg")
 Background = pg.transform.scale(Background,(800,600))
 Title = pg.image.load("Title.PNG")
 Title = pg.transform.scale(Title,(680,150))
+HowToPlayImg = pg.image.load("background.jpg")
+HowToPlayImg = pg.transform.scale(HowToPlayImg,(800,600))
 
 pg.mixer_music.load("backgroundmusic.mp3")
 pg.mixer_music.play(-1,0.0)
@@ -24,6 +26,7 @@ IMAGE_DOWN.fill(pg.Color('black'))
 
 def displayimage(Imagename,x,y):
     screen.blit(Imagename,(x,y))
+
 class Button(pg.sprite.Sprite):
 
     def __init__(self, x, y, width, height, callback,
@@ -76,7 +79,6 @@ class StartScreen:
         self.screen = screen
 
         self.all_sprites = pg.sprite.Group()
-        self.number = 0
 
         self.start_button = Button(
             50, 350, 200, 65, self.start_game,
@@ -90,9 +92,6 @@ class StartScreen:
         self.how_to_play_button = Button(
             300, 350, 200, 65, self.how_to_play,
             FONT, 'How To Play', (255, 255, 255))
-        self.back_button = Button(
-            450,350,200,65,self.back,
-            FONT,'Back',(255,255,255))
 
         self.all_sprites.add(self.start_button, self.quit_button,self.how_to_play_button)
 
@@ -103,12 +102,11 @@ class StartScreen:
         pass
 
     def how_to_play(self):
-        screen.fill(30,30,30)
-    def back(self):
-        pass
+        global flag
+        flag = 2
 
     def run(self):
-        while not self.done:
+        while not self.done and flag == 1:
             self.dt = self.clock.tick(30) / 1000
             self.handle_events()
             self.run_logic()
@@ -130,7 +128,49 @@ class StartScreen:
         self.all_sprites.draw(self.screen)
         pg.display.flip()
 
+class HowToPlayScreen:
+    def __init__(self, screen):
+        self.done = False
+        self.clock = pg.time.Clock()
+        self.screen = screen
+        self.all_sprites = pg.sprite.Group()
+
+        self.back_button = Button(
+        50, 350, 200, 65, self.back,
+        FONT, 'Back', (255, 255, 255),
+        IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
+        self.all_sprites.add(self.back_button)
+
+    def back(self):
+        global flag
+        flag = 1
+
+    def run(self):
+        while not self.done and flag == 2:
+            self.dt = self.clock.tick(30) / 1000
+            self.handle_events()
+            self.run_logic()
+            self.draw()
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.done = True
+            for button in self.all_sprites:
+                button.handle_event(event)
+
+    def run_logic(self):
+        self.all_sprites.update(self.dt)
+
+    def draw(self):
+        displayimage(HowToPlayImg,0,0)
+        self.all_sprites.draw(self.screen)
+        pg.display.flip()
 
 if __name__ == '__main__':
-    StartScreen(screen).run()
+    while flag != 0:
+        if flag == 1:
+            StartScreen(screen).run()
+        elif flag == 2:
+            HowToPlayScreen(screen).run()
     pg.quit()
