@@ -8,9 +8,6 @@ import numpy as np
 from pygame.locals import *
 
 
-pygame.mixer.init()
-sound = pygame.mixer.Sound("break.wav")
-sound.set_volume(0.5)
 
 
 FPS = 15
@@ -229,7 +226,6 @@ def runGame():
                     terminate()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                sound.play()
                 pos = pygame.mouse.get_pos()
                 mouse_x = pos[0]
                 mouse_y = pos[1]
