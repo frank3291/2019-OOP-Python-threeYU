@@ -7,7 +7,7 @@ Background = pg.image.load("background.jpg")
 Background = pg.transform.scale(Background,(800,600))
 Title = pg.image.load("Title.PNG")
 Title = pg.transform.scale(Title,(680,150))
-HowToPlayImg = pg.image.load("background.jpg")
+HowToPlayImg = pg.image.load("howtoplayimg.PNG")
 HowToPlayImg = pg.transform.scale(HowToPlayImg,(800,600))
 
 pg.mixer_music.load("backgroundmusic.mp3")
@@ -33,6 +33,7 @@ class Button(pg.sprite.Sprite):
                  font=FONT, text='', text_color=(0, 0, 0),
                  image_normal=IMAGE_NORMAL, image_hover=IMAGE_HOVER,
                  image_down=IMAGE_DOWN):
+
         super().__init__()
 
         self.image_normal = pg.transform.scale(image_normal, (width, height))
@@ -97,6 +98,8 @@ class StartScreen:
 
     def quit_game(self):
         self.done = True
+        global flag
+        flag = 0
 
     def start_game(self):
         pass
@@ -136,7 +139,7 @@ class HowToPlayScreen:
         self.all_sprites = pg.sprite.Group()
 
         self.back_button = Button(
-        50, 350, 200, 65, self.back,
+        300, 520, 200, 65, self.back,
         FONT, 'Back', (255, 255, 255),
         IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
         self.all_sprites.add(self.back_button)
