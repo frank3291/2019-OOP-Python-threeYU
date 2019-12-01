@@ -33,8 +33,8 @@ S_1=pygame.image.load("S_1.png")
 S_1=pygame.transform.scale(S_1,(142,156))
 
 #setting part
-playerdata={'Name':'frank','rank':'C','count':10}
-playerimage=C_1
+playerdata={'Name':'frank','rank':'A','count':10}
+playerimage=A_2
 pygame.init()
 FPS = 15
 WINDOWWIDTH = 600
