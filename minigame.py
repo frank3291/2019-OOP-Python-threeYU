@@ -70,10 +70,12 @@ RIGHT = 'right'
 #text
 timertext=pygame.font.SysFont('freesansbold.ttf', 150)
 normaltext = pygame.font.SysFont('freesansbold.ttf', 24)
-
-def terminate():
-    pygame.quit()
-    sys.exit()
+#flag
+endgame=False
+def terminate(endgame):
+    if endgame:
+        return 1
+    return 0
 
 def getRandomLocation(x,y):
     ans={'x': random.randint(7, x-1), 'y': random.randint(7, y - 1)}
@@ -90,13 +92,13 @@ def InputImage(x,y,IMG):
 
 def checkForKeyPress():
     if len(pygame.event.get(QUIT)) > 0:
-        terminate()
+        terminate(False)
 
     keyUpEvents = pygame.event.get(KEYUP)
     if len(keyUpEvents) == 0:
         return None
     if keyUpEvents[0].key == K_ESCAPE:
-        terminate()
+        terminate(False)
     return keyUpEvents[0].key
 
 
@@ -320,7 +322,10 @@ def main(playerdata,playerimage): #playerdata={name,rank}
     showStartScreen()
     tmp=runGame(playerdata,playerimage)
     showGameOverScreen(tmp)
-    terminate()
+    if tmp==1:
+        return terminate(True)
+    else:
+        return terminate(False)
 
 def runGame(playerdata,playerimage):
     pygame.mixer.music.load('bgmusic.mp3')
@@ -373,7 +378,7 @@ def runGame(playerdata,playerimage):
         nowy = human.y
         for event in pygame.event.get():
             if event.type == QUIT:
-                terminate()
+                terminate(False)
             elif event.type == KEYDOWN:
                 if (event.key == K_LEFT or event.key == K_a) and nowx - 1 >= 0 and bg.maze[nowy][nowx - 1] == 1:
                     human.moveLeft()
@@ -384,7 +389,7 @@ def runGame(playerdata,playerimage):
                 elif (event.key == K_DOWN or event.key == K_s) and nowy + 1 < bg.N and bg.maze[nowy + 1][nowx] == 1:
                     human.moveDown()
                 elif event.key == K_ESCAPE:
-                    terminate()
+                    terminate(False)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
@@ -399,8 +404,6 @@ def runGame(playerdata,playerimage):
         if nowx == w - 1 and nowy == h - 1:
             return 1
         for i in range(monnum):
-             if monsters[i].x==0 or monsters[i].y==0:
-                 break
              if monsters[i].x==nowx and monsters[i].y==nowy:
                 return 0
 
@@ -426,4 +429,4 @@ def runGame(playerdata,playerimage):
         FPSCLOCK.tick(FPS)
 
 if __name__ == '__main__':
-    main(playerdata,playerimage)
+    print(main(playerdata,playerimage))

@@ -21,15 +21,15 @@ C_3=pygame.transform.scale(C_3,(20,20))
 S_1=pygame.image.load("S_1.png")
 S_1=pygame.transform.scale(S_1,(20,20))
 BOSS=pygame.image.load("wickid.jpg")
-BOSS=pygame.transform.scale(BOSS,(1500,600))
+BOSS=pygame.transform.scale(BOSS,(1200,800))
 END=pygame.image.load("end.png")
-END=pygame.transform.scale(END,(1500,600))
+END=pygame.transform.scale(END,(1200,800))
 badend=pygame.image.load("badend.jpg")
-badend=pygame.transform.scale(badend,(1500,600))
+badend=pygame.transform.scale(badend,(1200,800))
 
 global WINDOWEVENT, WINDOWHEIGHT, TEXTCOLOR, BACKGROUNDCOLOR, FPS, BADDIEMINSIZE, BADDIEMAXSIZE, BADDIEMINSPEED, BADDIEMAXSPEED, ADDNEWBADDIERATE, PLAYERMOVERATE, topScore
-WINDOWWIDTH = 1500
-WINDOWHEIGHT = 600
+WINDOWWIDTH = 1200
+WINDOWHEIGHT = 800
 TEXTCOLOR = (255, 255, 255)
 BACKGROUNDCOLOR = (0, 0, 0)
 FPS = 40
@@ -40,7 +40,6 @@ BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
 topScore = 0
-
 #
 global playerdata,playerImage
 Playerdata={'Name':'frank','rank':'A','count':10}
@@ -52,18 +51,19 @@ def setting(Playerdata,PlayerImage):
     playerdata=Playerdata
     playerImage=PlayerImage
 
-def terminate():
-    pygame.quit()
-    sys.exit()
+def terminate(endgame):
+    if endgame:
+        return 1
+    return 0
 
 def waitForPlayerToPressKey(endgame):
     while True:
         for event in pygame.event.get():
             if event.type == QUIT and endgame:
-                terminate()
+                terminate(endgame)
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE and endgame :
-                    terminate()
+                    terminate(endgame)
                 if event.key !=K_SPACE:
                     return
 
@@ -103,12 +103,12 @@ fontnormal = pygame.font.SysFont(None,30)
 def showbosshp(hp,screen):
     if hp<=0:
         hp=0
-    drawText('boss | wikid', fontnormal, windowSurface, 250,35)
+    drawText('boss | wickid', fontnormal, windowSurface, 250,35)
     pygame.draw.rect(screen,(255,0,0),(250,20,hp,10))
 
 def drawuserhp(hp,screen):
-    drawText('HP', fontnormal, windowSurface, 1450,560)
-    pygame.draw.rect(screen,(0,255,0),(1450,550,20,-hp))
+    drawText('HP', fontnormal, windowSurface, 1150,560)
+    pygame.draw.rect(screen,(0,255,0),(1150,550,20,-hp))
 
 
 setting(Playerdata,PlayerImage)
@@ -161,7 +161,7 @@ def main():
                             if hotspot['hp'] < 0:
                                 flag = True
                 if event.type == QUIT:
-                    terminate()
+                    terminate(True)
 
                 if event.type == KEYDOWN:
                     if event.key == ord('z'):
@@ -191,7 +191,7 @@ def main():
                         slowCheat = False
                         score = 0
                     if event.key == K_ESCAPE:
-                        terminate()
+                        terminate(True)
 
                     if event.key == K_LEFT or event.key == ord('a'):
                         moveLeft = False
@@ -228,7 +228,6 @@ def main():
             if moveDown and playerRect.bottom < WINDOWHEIGHT:
                 playerRect.move_ip(0, PLAYERMOVERATE)
 
-            pygame.mouse.set_pos(playerRect.centerx, playerRect.centery)
 
             for b in baddies:
                 if not reverseCheat and not slowCheat:
@@ -300,14 +299,14 @@ def main():
         if userhp <= 0:
             windowSurface.blit(badend, (0, 0))
             drawText('You Lose!! ', font, windowSurface, 100, 450)
-            endgame = True
+            endgame = False
         if hp <= 0 and userhp > 0:
             windowSurface.blit(END, (0, 0))
             drawText('You WIN!! THE END', font, windowSurface, 100, 450)
             endgame = True
         pygame.display.update()
         pygame.time.wait(3000)
-        terminate()
+        terminate(endgame)
 
 main()
 
