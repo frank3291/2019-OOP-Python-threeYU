@@ -316,16 +316,16 @@ def main(playerdata,playerimage): #playerdata={name,rank}
     global FPSCLOCK, DISPLAYSURF, BASICFONT
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
-    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+    DISPLAYSURF = pygame.display.set_mode((1200, 800))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
     pygame.display.set_caption('MAZE')
     showStartScreen()
     tmp=runGame(playerdata,playerimage)
     showGameOverScreen(tmp)
     if tmp==1:
-        return terminate(True)
+        return 1
     else:
-        return terminate(False)
+        return 0
 
 def runGame(playerdata,playerimage):
     pygame.mixer.music.load('bgmusic.mp3')

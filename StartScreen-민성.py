@@ -2,20 +2,25 @@
 import pygame as pg
 import minigame
 import boss
-
+dataforboss={}
+dataformini={'0':[minigame.C_3,'Chuck','C',3],'1':[minigame.C_1,'Winston','C',3],'2':[minigame.C_2,'Frypan','C',3],'3':[minigame.B_1,'Gally','B',7],'4':[minigame.B_2,'Alby','B',7],'5':[minigame.B_3,'Branda','B',7],'6':[minigame.A_3,'Newt','A',10],'7':[minigame.A_2,'Teresa','A',10],'8':[minigame.A_1,'Minho','A',10],'9':[minigame.S_1,'Thomas','S',50]}
 playerdata={'Name':'thomas','rank':'S','count':15}
-playerimage = minigame.S_1
+playerimage1 = minigame.S_1
+playerimage2 = boss.S_1
 
 pg.init()
+
 flag = 1
 ticket = 0
+
 Background = pg.image.load("background.jpg")
 Background = pg.transform.scale(Background,(1200,800))
 Title = pg.image.load("Title.PNG")
 Title = pg.transform.scale(Title,(900,250))
 HowToPlayImg = pg.image.load("howtoplayimg.PNG")
 HowToPlayImg = pg.transform.scale(HowToPlayImg,(1200,800))
-
+GamePlayImg = pg.image.load("GamePlayIMG.png")
+GamePlayImg = pg.transform.scale(GamePlayImg,(1200,800))
 pg.mixer_music.load("backgroundmusic.mp3")
 pg.mixer_music.play(-1,0.0)
 
@@ -96,16 +101,16 @@ class StartScreen(Screen):
         self.all_sprites = pg.sprite.Group()
 
         self.start_button = Button(
-            50, 550, 200, 65, self.start_game,
+            150, 550, 200, 65, self.start_game,
             FONT, 'Game Start', (255, 255, 255),
             IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
 
         self.quit_button = Button(
-            550, 550, 200, 65, self.quit_game,
+            850, 550, 200, 65, self.quit_game,
             FONT, 'Quit', (255, 255, 255))
 
         self.how_to_play_button = Button(
-            300, 550, 200, 65, self.how_to_play,
+            500, 550, 200, 65, self.how_to_play,
             FONT, 'How To Play', (255, 255, 255))
 
         self.all_sprites.add(self.start_button, self.quit_button,self.how_to_play_button)
@@ -144,7 +149,7 @@ class HowToPlayScreen(Screen):
         self.all_sprites = pg.sprite.Group()
 
         self.back_button = Button(
-        300, 520, 200, 65, self.back,
+        500, 700, 200, 65, self.back,
         FONT, 'Back', (255, 255, 255),
         IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
 
@@ -174,27 +179,27 @@ class GameplayScreen(Screen):
         self.all_sprites = pg.sprite.Group()
 
         self.minigame_button = Button(
-        550, 520, 200, 65, self.minigame_start,
+        50, 700, 200, 65, self.minigame_start,
         FONT, 'Minigame', (255, 255, 255),
         IMAGE_NORMAL, IMAGE_HOVER, IMAGE_DOWN)
 
         self.Boss_button = Button(
-        50, 520, 200, 65, self.Boss_start,
+        950, 700, 200, 65, self.Boss_start,
         FONT, 'Boss Game', (255, 255, 255))
 
         self.all_sprites.add(self.Boss_button,self.minigame_button)
 
     def minigame_start(self):
         global ticket
-        V = minigame.main(playerdata,playerimage)
+        V = minigame.main(playerdata,playerimage1)
         if V == 1:
             ticket += 10
         elif V == 0:
             pass
-
+        print(ticket)
     def Boss_start(self):
         global ticket
-        boss.setting(playerdata,playerimage)
+        boss.setting(playerdata,playerimage2)
         V = boss.main()
         if V == 1:
             ticket += 10
@@ -210,7 +215,7 @@ class GameplayScreen(Screen):
             self.draw()
 
     def draw(self):
-        displayimage(HowToPlayImg,0,0)
+        displayimage(GamePlayImg,0,0)
         self.all_sprites.draw(self.screen)
         pg.display.flip()
 

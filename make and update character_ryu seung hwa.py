@@ -3,20 +3,13 @@ from pygame.locals import *
 import time
 
 TIMER = 300
-SCREEN_X = 400
-SCREEN_Y = 400
-
-screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
 clock = pygame.time.Clock() #tick-tock
 
-ending = button1 = button2 = False
-
 counter = 0
-sec =0 # 타이머(1초에 1씩 증가해서 출력)
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
-pygame.init()
+
 maze_runner_character_image = [0,0,0,0,0,0,0,0,0,0]
 is_image = [[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1]]
 character_checked = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
@@ -60,7 +53,6 @@ def update_character():
                 pygame.display.update()
 
 while (True):
-
     counter+=1
     clock.tick(TIMER)
     cnt_checked_character = 0
@@ -68,7 +60,6 @@ while (True):
         for j in range(4):
             if character_checked[i][j] == 1:
                 cnt_checked_character = cnt_checked_character +1
-
 
     flag=1
     if counter%500 == 0:
@@ -88,8 +79,6 @@ while (True):
                     flag=0
             if flag == 0:
                 break
-
-
 
     for event in pygame.event.get():
         if event.type == KEYDOWN:
