@@ -118,6 +118,3 @@ while (True):
                             screen.blit(maze_runner_character_image[is_image[i][j]], (range_check[j], range_check[i]))
                             pygame.display.update()
                             update_character()
-
-
-
