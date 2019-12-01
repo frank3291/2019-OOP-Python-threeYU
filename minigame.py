@@ -31,7 +31,8 @@ C_3=pygame.image.load("C_3.png")
 C_3=pygame.transform.scale(C_3,(142,156))
 S_1=pygame.image.load("S_1.png")
 S_1=pygame.transform.scale(S_1,(142,156))
-
+minihelp=pygame.image.load('mini.png')
+minihelp=pygame.transform.scale(minihelp,(600,800))
 #setting part
 playerdata={'Name':'frank','rank':'A','count':10}
 playerimage=A_2
@@ -414,6 +415,7 @@ def runGame(playerdata,playerimage):
                 greeber.x=next[0]
                 greeber.y=next[1]
         DISPLAYSURF.fill(BGCOLOR)
+        DISPLAYSURF.blit(minihelp,(600,0))
         drawGrid()
         bg.draw()
         bg.drawbackground(timerimg, infoimg, timerstr)

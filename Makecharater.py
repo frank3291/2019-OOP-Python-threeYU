@@ -4,8 +4,8 @@ import time
 
 TIMER = 300
 clock = pygame.time.Clock() #tick-tock
-
-counter = 0
+screen = pygame.display.set_mode((1200, 800))
+ticket=0
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -38,16 +38,17 @@ check = pygame.transform.scale(check, (100,100))
 
 range_check = [0, 100, 200, 300, 400]
 
-def update_character():
+def update_character(i,j,t):
     for k in range(4):
         for l in range(4):
-            if character_checked[k][l] == 1 and not (k == i and l == j) and is_image[k][l] == is_image[i][j]:
-                screen.blit(image_delete, (j * 100, i * 100))
-                screen.blit(image_delete, (l * 100, k * 100))
+            if character_checked[k][l] == 1 and not (k == i and l == j) and is_image[k][l] == is_image[i][j] and t > 0:
+                screen.blit(image_delete, (j * 100+400, i * 100+200))
+                screen.blit(image_delete, (l * 100+400, k * 100+200))
                 character_checked[i][j] = 0
                 character_checked[k][l] = 0
-                screen.blit(maze_runner_character_image[is_image[i][j] + 1], (l * 100, k * 100))
+                screen.blit(maze_runner_character_image[is_image[i][j] + 1], (l * 100+400, k * 100+200))
                 is_image[k][l] = is_image[k][l] + 1
                 is_image[i][j] = - 1
-
+                t -= 1
                 pygame.display.update()
+    return t
