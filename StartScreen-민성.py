@@ -1,8 +1,14 @@
 # 맨 처음 시작화면
 import pygame as pg
+import minigame
+import boss
+
+playerdata={'Name':'thomas','rank':'S','count':15}
+playerimage = minigame.S_1
 
 pg.init()
 flag = 1
+ticket = 0
 Background = pg.image.load("background.jpg")
 Background = pg.transform.scale(Background,(1200,800))
 Title = pg.image.load("Title.PNG")
@@ -69,7 +75,18 @@ class Button(pg.sprite.Sprite):
             elif not collided:
                 self.image = self.image_normal
 
-class StartScreen:
+class Screen:
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.done = True
+            for button in self.all_sprites:
+                button.handle_event(event)
+
+    def run_logic(self):
+        self.all_sprites.update(self.dt)
+
+class StartScreen(Screen):
 
     def __init__(self, screen):
         self.done = False
@@ -113,23 +130,13 @@ class StartScreen:
             self.run_logic()
             self.draw()
 
-    def handle_events(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.done = True
-            for button in self.all_sprites:
-                button.handle_event(event)
-
-    def run_logic(self):
-        self.all_sprites.update(self.dt)
-
     def draw(self):
         displayimage(Background,0,0)
         displayimage(Title,150,150)
         self.all_sprites.draw(self.screen)
         pg.display.flip()
 
-class HowToPlayScreen:
+class HowToPlayScreen(Screen):
     def __init__(self, screen):
         self.done = False
         self.clock = pg.time.Clock()
@@ -154,22 +161,12 @@ class HowToPlayScreen:
             self.run_logic()
             self.draw()
 
-    def handle_events(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.done = True
-            for button in self.all_sprites:
-                button.handle_event(event)
-
-    def run_logic(self):
-        self.all_sprites.update(self.dt)
-
     def draw(self):
         displayimage(HowToPlayImg,0,0)
         self.all_sprites.draw(self.screen)
         pg.display.flip()
 
-class GameplayScreen:
+class GameplayScreen(Screen):
     def __init__(self, screen):
         self.done = False
         self.clock = pg.time.Clock()
@@ -188,10 +185,22 @@ class GameplayScreen:
         self.all_sprites.add(self.Boss_button,self.minigame_button)
 
     def minigame_start(self):
-        pass
+        global ticket
+        V = minigame.main(playerdata,playerimage)
+        if V == 1:
+            ticket += 10
+        elif V == 0:
+            pass
 
     def Boss_start(self):
-        pass
+        global ticket
+        boss.setting(playerdata,playerimage)
+        V = boss.main()
+        if V == 1:
+            ticket += 10
+        elif V == 0:
+            pass
+        print(ticket)
 
     def run(self):
         while not self.done and flag == 3:
@@ -200,26 +209,17 @@ class GameplayScreen:
             self.run_logic()
             self.draw()
 
-    def handle_events(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.done = True
-            for button in self.all_sprites:
-                button.handle_event(event)
-
-    def run_logic(self):
-        self.all_sprites.update(self.dt)
-
     def draw(self):
         displayimage(HowToPlayImg,0,0)
         self.all_sprites.draw(self.screen)
         pg.display.flip()
+
 if __name__ == '__main__':
     while flag != 0:
         if flag == 1:
             StartScreen(screen).run()
         elif flag == 2:
             HowToPlayScreen(screen).run()
-        elif flag ==3:
+        elif flag == 3:
             GameplayScreen(screen).run()
     pg.quit()
