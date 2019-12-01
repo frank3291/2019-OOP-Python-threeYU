@@ -64,7 +64,7 @@ while (True):
     counter+=1
     clock.tick(TIMER)
     flag=1
-    if counter%100 == 0:
+    if counter%500 == 0:
         best_character = 0
         for i in range(4):
             for j in range(4):
