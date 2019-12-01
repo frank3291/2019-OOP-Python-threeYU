@@ -13,15 +13,14 @@ ending = button1 = button2 = False
 
 counter = 0
 sec =0 # 타이머(1초에 1씩 증가해서 출력)
-time_limit = 60 # 제한 시간
 
-BLACK=(0,0,0)
-WHITE=(255,255,255)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
 pygame.init()
-# corner = [[0,0],[100,0],[200,0],[300,0],[0,100],[100,100],[200,100],[300,100],[0,200],[100,200],[200,200],[300,200],[0,300],[100,300],[200,300],[300,300]]
 maze_runner_character_image = [0,0,0,0,0,0,0,0,0,0]
 is_image = [[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1]]
 character_checked = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+
 
 maze_runner_character_image[0] = pygame.image.load("MR1.png").convert_alpha()
 maze_runner_character_image[1] = pygame.image.load("MR2.png").convert_alpha()
@@ -56,13 +55,21 @@ def update_character():
                 character_checked[k][l] = 0
                 screen.blit(maze_runner_character_image[is_image[i][j] + 1], (l * 100, k * 100))
                 is_image[k][l] = is_image[k][l] + 1
-                is_image[i][j] = -1
+                is_image[i][j] = - 1
+
                 pygame.display.update()
 
 while (True):
 
     counter+=1
     clock.tick(TIMER)
+    cnt_checked_character = 0
+    for i in range(4):
+        for j in range(4):
+            if character_checked[i][j] == 1:
+                cnt_checked_character = cnt_checked_character +1
+
+
     flag=1
     if counter%500 == 0:
         best_character = 0
@@ -96,18 +103,17 @@ while (True):
 
                 for i in range(4):
                     for j in range(4):
-                        if is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1] and character_checked[i][j] == 0 and is_image[i][j] < 9:
+                        if is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1] and character_checked[i][j] == 0 and is_image[i][j] < 9 and cnt_checked_character < 2:
                             #print("click")
                             screen.blit(check, (range_check[j], range_check[i]))
                             pygame.display.update()
                             character_checked[i][j] = 1
+                            cnt_checked_character = cnt_checked_character + 1
                             update_character()
 
                         elif is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1] and character_checked[i][j] == 1:
                             character_checked[i][j] = 0
+                            cnt_checked_character = cnt_checked_character - 1
                             screen.blit(maze_runner_character_image[is_image[i][j]], (range_check[j], range_check[i]))
                             pygame.display.update()
                             update_character()
-
-
-
