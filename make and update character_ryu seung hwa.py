@@ -14,8 +14,8 @@ ending = button1 = button2 = False
 counter = 0
 sec =0 # 타이머(1초에 1씩 증가해서 출력)
 
-BLACK=(0,0,0)
-WHITE=(255,255,255)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
 pygame.init()
 maze_runner_character_image = [0,0,0,0,0,0,0,0,0,0]
 is_image = [[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1],[-1,-1,-1,-1]]
