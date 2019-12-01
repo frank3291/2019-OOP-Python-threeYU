@@ -2,15 +2,17 @@
 import pygame as pg
 import minigame
 import boss
-dataforboss={}
-dataformini={'0':[minigame.C_3,'Chuck','C',3],'1':[minigame.C_1,'Winston','C',3],'2':[minigame.C_2,'Frypan','C',3],'3':[minigame.B_1,'Gally','B',7],'4':[minigame.B_2,'Alby','B',7],'5':[minigame.B_3,'Branda','B',7],'6':[minigame.A_3,'Newt','A',10],'7':[minigame.A_2,'Teresa','A',10],'8':[minigame.A_1,'Minho','A',10],'9':[minigame.S_1,'Thomas','S',50]}
+from Makecharater import *
+
+dataforboss={0:[boss.C_3,'Chuck','C',3],1:[boss.C_1,'Winston','C',3],2:[boss.C_2,'Frypan','C',3],3:[boss.B_1,'Gally','B',7],4:[boss.B_2,'Alby','B',7],5:[boss.B_3,'Branda','B',7],6:[boss.A_3,'Newt','A',10],7:[boss.A_2,'Teresa','A',10],8:[boss.A_1,'Minho','A',10],9:[boss.S_1,'Thomas','S',50]}
+dataformini={0:[minigame.C_3,'Chuck','C',3],1:[minigame.C_1,'Winston','C',3],2:[minigame.C_2,'Frypan','C',3],3:[minigame.B_1,'Gally','B',7],4:[minigame.B_2,'Alby','B',7],5:[minigame.B_3,'Branda','B',7],6:[minigame.A_3,'Newt','A',10],7:[minigame.A_2,'Teresa','A',10],8:[minigame.A_1,'Minho','A',10],9:[minigame.S_1,'Thomas','S',50]}
 playerdata={'Name':'thomas','rank':'S','count':15}
 playerimage1 = minigame.S_1
 playerimage2 = boss.S_1
 
 pg.init()
-
-flag = 1
+counter = 0
+F = 1
 ticket = 0
 
 Background = pg.image.load("background.jpg")
@@ -117,19 +119,19 @@ class StartScreen(Screen):
 
     def quit_game(self):
         self.done = True
-        global flag
-        flag = 0
+        global F
+        F = 0
 
     def start_game(self):
-        global flag
-        flag = 3
+        global F
+        F = 3
 
     def how_to_play(self):
-        global flag
-        flag = 2
+        global F
+        F = 2
 
     def run(self):
-        while not self.done and flag == 1:
+        while not self.done and F == 1:
             self.dt = self.clock.tick(30) / 1000
             self.handle_events()
             self.run_logic()
@@ -156,11 +158,11 @@ class HowToPlayScreen(Screen):
         self.all_sprites.add(self.back_button)
 
     def back(self):
-        global flag
-        flag = 1
+        global F
+        F = 1
 
     def run(self):
-        while not self.done and flag == 2:
+        while not self.done and F == 2:
             self.dt = self.clock.tick(30) / 1000
             self.handle_events()
             self.run_logic()
@@ -208,7 +210,61 @@ class GameplayScreen(Screen):
         print(ticket)
 
     def run(self):
-        while not self.done and flag == 3:
+        global counter
+        while not self.done and F == 3:
+            counter += 1
+            clock.tick(TIMER)
+            cnt_checked_character = 0
+            for i in range(4):
+                for j in range(4):
+                    if character_checked[i][j] == 1:
+                        cnt_checked_character = cnt_checked_character + 1
+
+            flag = 1
+            if counter % 500 == 0:
+                best_character = 0
+                for i in range(4):
+                    for j in range(4):
+                        if best_character < is_image[i][j]:
+                            best_character = is_image[i][j]
+
+                for i in range(4):
+                    for j in range(4):
+                        if is_image[i][j] == -1 and flag == 1:
+                            screen.blit(maze_runner_character_image[0], (j * 100, i * 100))
+                            is_image[i][j] = 0
+                            pg.display.update()
+                            flag = 0
+                    if flag == 0:
+                        break
+
+            for event in pg.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        ending = True  # Time to leave
+                        print("Game Stopped Early by user")
+
+                elif event.type == MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        mouse_x, mouse_y = event.pos
+
+                        for i in range(4):
+                            for j in range(4):
+                                if is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j + 1] and mouse_y > range_check[i] and mouse_y < range_check[i + 1] and character_checked[i][j] == 0 and is_image[i][j] < 9 and cnt_checked_character < 2:
+                                    # print("click")
+                                    screen.blit(check, (range_check[j], range_check[i]))
+                                    pg.display.update()
+                                    character_checked[i][j] = 1
+                                    cnt_checked_character = cnt_checked_character + 1
+                                    update_character()
+
+                                elif is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j + 1] and mouse_y > range_check[i] and mouse_y < range_check[i + 1] and character_checked[i][j] == 1:
+                                    character_checked[i][j] = 0
+                                    cnt_checked_character = cnt_checked_character - 1
+                                    screen.blit(maze_runner_character_image[is_image[i][j]],
+                                                (range_check[j], range_check[i]))
+                                    pg.display.update()
+                                    update_character()
             self.dt = self.clock.tick(30) / 1000
             self.handle_events()
             self.run_logic()
@@ -220,11 +276,11 @@ class GameplayScreen(Screen):
         pg.display.flip()
 
 if __name__ == '__main__':
-    while flag != 0:
-        if flag == 1:
+    while F != 0:
+        if F == 1:
             StartScreen(screen).run()
-        elif flag == 2:
+        elif F == 2:
             HowToPlayScreen(screen).run()
-        elif flag == 3:
+        elif F == 3:
             GameplayScreen(screen).run()
     pg.quit()
