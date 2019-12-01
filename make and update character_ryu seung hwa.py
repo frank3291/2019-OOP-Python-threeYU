@@ -54,7 +54,6 @@ def update_character():
                 screen.blit(image_delete, (l * 100, k * 100))
                 character_checked[i][j] = 0
                 character_checked[k][l] = 0
-
                 screen.blit(maze_runner_character_image[is_image[i][j] + 1], (l * 100, k * 100))
                 is_image[k][l] = is_image[k][l] + 1
                 is_image[i][j] = -1
@@ -65,7 +64,7 @@ while (True):
     counter+=1
     clock.tick(TIMER)
     flag=1
-    if counter%500 == 0:
+    if counter%100 == 0:
         best_character = 0
         for i in range(4):
             for j in range(4):
@@ -97,7 +96,7 @@ while (True):
 
                 for i in range(4):
                     for j in range(4):
-                        if is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1] and character_checked[i][j] == 0:
+                        if is_image[i][j] != -1 and mouse_x > range_check[j] and mouse_x < range_check[j+1] and mouse_y > range_check[i] and mouse_y < range_check[i+1] and character_checked[i][j] == 0 and is_image[i][j] < 9:
                             #print("click")
                             screen.blit(check, (range_check[j], range_check[i]))
                             pygame.display.update()
@@ -110,21 +109,5 @@ while (True):
                             pygame.display.update()
                             update_character()
 
-
-
-
-
-
-    # if counter == TIMER:  #prints the statements once a second
-    #
-    #     counter=0
-    #     print("%.2f" % sec)
-    #     sec = sec +1
-    #
-    #     if sec%5 == 0:
-    #         image_new = pygame.image.load("MR3.png").convert_alpha()
-    #         image_new = pygame.transform.scale(image_new, (image_length, image_height))
-    #         screen.blit(image_new, (200,0))
-    #         pygame.display.update()
 
 
