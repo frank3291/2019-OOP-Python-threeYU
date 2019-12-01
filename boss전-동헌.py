@@ -1,6 +1,31 @@
 import pygame, random, sys
 from pygame.locals import *
-
+A_1=pygame.image.load("A_1.png")
+A_1=pygame.transform.scale(A_1,(20,20))
+A_2=pygame.image.load("A_2.png")
+A_2=pygame.transform.scale(A_2,(20,20))
+A_3=pygame.image.load("A_3.png")
+A_3=pygame.transform.scale(A_3,(20,20))
+B_1=pygame.image.load("B_1.png")
+B_1=pygame.transform.scale(B_1,(20,20))
+B_2=pygame.image.load("B_2.png")
+B_2=pygame.transform.scale(B_2,(20,20))
+B_3=pygame.image.load("B_3.png")
+B_3=pygame.transform.scale(B_3,(20,20))
+C_1=pygame.image.load("C_1.png")
+C_1=pygame.transform.scale(C_1,(20,20))
+C_2=pygame.image.load("C_2.png")
+C_2=pygame.transform.scale(C_2,(20,20))
+C_3=pygame.image.load("C_3.png")
+C_3=pygame.transform.scale(C_3,(20,20))
+S_1=pygame.image.load("S_1.png")
+S_1=pygame.transform.scale(S_1,(20,20))
+BOSS=pygame.image.load("wickid.jpg")
+BOSS=pygame.transform.scale(BOSS,(1500,600))
+END=pygame.image.load("end.png")
+END=pygame.transform.scale(END,(1500,600))
+badend=pygame.image.load("badend.jpg")
+badend=pygame.transform.scale(badend,(1500,600))
 WINDOWWIDTH = 1500
 WINDOWHEIGHT = 600
 TEXTCOLOR = (255, 255, 255)
@@ -13,6 +38,16 @@ BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6
 PLAYERMOVERATE = 5
 #
+global playerdata,playerImage
+Playerdata={'Name':'frank','rank':'A','count':10}
+PlayerImage = A_1
+PlayerImage=pygame.transform.scale(PlayerImage,(20,20))
+
+def setting(Playerdata,PlayerImage):
+    global playerdata,playerImage
+    playerdata=Playerdata
+    playerImage=PlayerImage
+
 def terminate():
     pygame.quit()
     sys.exit()
@@ -20,12 +55,13 @@ def terminate():
 def waitForPlayerToPressKey(endgame):
     while True:
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == QUIT and endgame:
                 terminate()
-            if event.type == KEYDOWN and event.type!=K_SPACE:
-                if event.key == K_ESCAPE or endgame :
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE and endgame :
                     terminate()
-                return
+                if event.key !=K_SPACE:
+                    return
 
 def playerHasHitBaddie(playerRect, baddies):
     for b in baddies:
@@ -50,7 +86,8 @@ def getRandomLocation():
 pygame.init()
 mainClock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption('BOSS')
+windowSurface.blit(BOSS,(0,0))
+pygame.display.set_caption('LAST STAGE')
 pygame.mouse.set_visible(False)
 def touchhotspot(hotspot):
     if playerRect.colliderect(hotspot['rect']):
@@ -70,19 +107,17 @@ def drawuserhp(hp,screen):
     pygame.draw.rect(screen,(0,255,0),(1450,550,20,-hp))
 
 
+setting(Playerdata,PlayerImage)
+
 pygame.mixer.music.load('background.mp3')
 pygame.mixer.music.play(-1,0.0)
-
-
-playerImage = pygame.image.load('player.png')
-playerImage=pygame.transform.scale(playerImage,(20,20))
 
 playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
 hotspotImage =pygame.image.load('hotspot.jpg')
 hotspotImage = pygame.transform.scale(hotspotImage,(40,40))
-drawText('BOSS', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
-drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
+drawText('BOSS', font, windowSurface, (WINDOWWIDTH / 2)-300, (WINDOWHEIGHT / 2)-100)
+drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 2), (WINDOWHEIGHT / 2) + 100)
 pygame.display.update()
 waitForPlayerToPressKey(False)
 
@@ -116,7 +151,7 @@ while True:
                     if event.key==K_SPACE:
                         if hp<=0:
                             cnt+=1
-                        hotspot['hp']-=100;
+                        hotspot['hp']-=2*playerdata['count']
                         if hotspot['hp']<0:
                             flag=True
             if event.type == QUIT:
@@ -124,9 +159,11 @@ while True:
 
             if event.type == KEYDOWN:
                 if event.key == ord('z'):
-                    reverseCheat = True
+                    if playerdata['rank']=='A' or playerdata['rank']=='S':
+                        reverseCheat = True
                 if event.key == ord('x'):
-                    slowCheat = True
+                    if playerdata['rank']=='S':
+                        slowCheat = True
                 if event.key == K_LEFT or event.key == ord('a'):
                     moveRight = False
                     moveLeft = True
@@ -202,7 +239,7 @@ while True:
         drawuserhp(userhp,windowSurface)
         if flag:
             if hp>0:
-                hp-=80
+                hp-=playerdata['count']*6
             Levelcount+=1
             BADDIEMINSPEED +=2
             BADDIEMAXSPEED +=2
@@ -212,7 +249,6 @@ while True:
             x=loc[0]
             y=loc[1]
             hotspot={'rect':pygame.Rect(x, y, 100, 100),'hp':random.randint(Levelcount*40,Levelcount*80)}
-        print(Levelcount)
         windowSurface.blit(hotspotImage,(x,y))
         drawText("%s"% (hotspot['hp']),font,windowSurface,x,y-20)
         showbosshp(hp,windowSurface)
@@ -226,29 +262,28 @@ while True:
             windowSurface.blit(b['surface'], b['rect'])
 
         if playerHasHitBaddie(playerRect, baddies) :
-            print("chk")
             userhp-=5*Levelcount//2
             if userhp<=0:
                 break
             if score > topScore:
                 topScore = score
         if hp<=0:
+            limit=95-playerdata['count']
             if firsttime:
-                print("chk")
                 firsttime=False
                 nowtime=seconds
             timeleft=10-(seconds-nowtime)//1
-            text1=font.render('PRESS SPACE!!  MORE THAN 80!!!!!!',True,(255,0,0))
+            text1=font.render('PRESS SPACE!!  MORE THAN %s!!!!!!'%(limit),True,(255,0,0))
             text2=font.render('%s' % (cnt), True,(255,0,0))
             text3=font.render('%s' % (timeleft),True,(255,0,0))
             windowSurface.blit(text1,((WINDOWWIDTH/2)-200, (WINDOWHEIGHT/2)-50))
             windowSurface.blit(text2,((WINDOWWIDTH/2)-150, (WINDOWHEIGHT/2)))
             windowSurface.blit(text3,((WINDOWWIDTH/2)-150,(WINDOWHEIGHT/2)+50))
             if timeleft<=0:
-                if cnt<80:
+                if cnt<limit:
                     userhp=-10
                     break
-                if cnt>80:
+                if cnt>=limit:
                     break
 
         pygame.display.update()
@@ -256,14 +291,14 @@ while True:
 
     pygame.mixer.music.stop()
     if userhp<=0:
-        windowSurface.fill(BACKGROUNDCOLOR)
-        drawText('You Lose!! ', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+        windowSurface.blit(badend,(0,0))
+        drawText('You Lose!! ', font, windowSurface, 100, 450)
         endgame=True
-    if hp<=0:
-        windowSurface.fill(BACKGROUNDCOLOR)
-        drawText('You WIN!! THE END', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+    if hp<=0 and userhp>0:
+        windowSurface.blit(END,(0,0))
+        drawText('You WIN!! THE END', font, windowSurface, 100, 450)
         endgame=True
-    drawText('Press a key to go menu.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
     pygame.display.update()
-    waitForPlayerToPressKey(endgame)
+    pygame.time.wait(3000)
+    terminate()
 
